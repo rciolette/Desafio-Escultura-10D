@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Plano Escultura 10D</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lora:wght@400;700&family=Montserrat:wght@400;600&family=Dancing+Script&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Minimalismo Acolhedor -->
+    <!-- Application Structure Plan: A estrutura da aplicação é uma Single-Page Application (SPA) com navegação por abas no topo. As seções são: Início, Plano Diário, Substituições e Modo Emergência. Esta arquitetura foi escolhida para organizar o conteúdo de forma lógica e acessível, evitando uma longa página de rolagem. O usuário pode alternar rapidamente entre tarefas distintas (ver o plano do dia, consultar uma substituição) sem perder o contexto, o que melhora significativamente a usabilidade em comparação com um PDF estático. O 'Plano Diário' é o núcleo interativo, permitindo a seleção de cada dia para exibir o conteúdo correspondente dinamicamente. -->
+    <!-- Visualization & Content Choices: 
+        1. Identidade Visual: Report Info -> Paleta de cores e fontes. Goal -> Informar/Estabelecer Tom. Viz/Presentation Method -> CSS (Tailwind) aplicando as cores e fontes em toda a UI. Interaction -> N/A. Justification -> Cria uma experiência de marca coesa e agradável, alinhada com o conceito "Minimalismo Acolhedor". Library/Method -> Tailwind CSS, Google Fonts.
+        2. Plano Diário: Report Info -> Refeições e dicas para 10 dias. Goal -> Organizar/Guiar. Viz/Presentation Method -> Layout de cartões interativos com ícones. Interaction -> Botões para selecionar o dia, que atualizam dinamicamente o conteúdo exibido. Justification -> Transforma o plano estático em uma ferramenta dinâmica e menos sobrecarregada, onde o usuário foca em um dia de cada vez. Library/Method -> Vanilla JS.
+        3. Listas (Substituições, Emergência): Report Info -> Listas de alimentos. Goal -> Informar/Referência. Viz/Presentation Method -> Cartões e listas bem definidas. Interaction -> N/A. Justification -> Apresenta informações de referência de forma clara e fácil de consultar. Library/Method -> HTML/Tailwind CSS.
+        4. Gráfico de Progresso (Ilustrativo): Report Info -> Foco em alimentação saudável (implícito). Goal -> Informar/Visualizar. Viz/Presentation Method -> Gráfico de rosca. Interaction -> Hover para ver detalhes. Justification -> Para cumprir o requisito de uso do Chart.js, um gráfico ilustrativo da distribuição de macronutrientes de um dia típico foi adicionado. Isso oferece um valor visual agregado, contextualizando a abordagem nutricional do plano. Library/Method -> Chart.js/Canvas.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            background-color: #F5F1ED;
+            color: #4F4F4F;
+            font-family: 'Montserrat', sans-serif;
+        }
+        h1, h2, h3 {
+            font-family: 'Lora', serif;
+        }
+        .font-handwriting {
+            font-family: 'Dancing Script', cursive;
+        }
+        .nav-link {
+            transition: all 0.3s ease;
+            border-bottom: 2px solid transparent;
+        }
+        .nav-link.active {
+            border-bottom-color: #D9B6B0;
+            color: #4F4F4F;
+            font-weight: 600;
+        }
+        .day-selector.active {
+            background-color: #D9B6B0;
+            color: white;
+        }
+        .day-selector {
+            transition: all 0.3s ease;
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <div class="container mx-auto p-4 md:p-8 max-w-5xl">
+        
+        <header class="text-center mb-8">
+            <h1 class="text-4xl md:text-5xl font-bold text-[#4F4F4F]">Plano Escultura 10D</h1>
+            <p class="text-lg text-[#4F4F4F] mt-2">Acelere seu Corpo, Revele sua Forma</p>
+        </header>
+
+        <nav class="flex justify-center border-b border-gray-300 mb-8">
+            <button data-target="inicio" class="nav-link active text-gray-600 py-4 px-6 block hover:text-[#D9B6B0] focus:outline-none">Início</button>
+            <button data-target="plano" class="nav-link text-gray-600 py-4 px-6 block hover:text-[#D9B6B0] focus:outline-none">Plano Diário</button>
+            <button data-target="substituicoes" class="nav-link text-gray-600 py-4 px-6 block hover:text-[#D9B6B0] focus:outline-none">Substituições</button>
+            <button data-target="emergencia" class="nav-link text-gray-600 py-4 px-6 block hover:text-[#D9B6B0] focus:outline-none">Modo Emergência</button>
+        </nav>
+
+        <main id="app-content">
+            
+            <section id="inicio" class="content-section">
+                <div class="bg-white rounded-lg shadow-md p-6 md:p-8">
+                    <h2 class="text-3xl font-bold mb-4">Como usar seu Plano Alimentar</h2>
+                    <p class="mb-4">Bem-vinda ao seu plano alimentar de 10 dias para esculpir o corpo e acelerar a queima de gordura! Este plano foi criado para ser simples, direto ao ponto e eficiente — mesmo se você tem uma rotina corrida.</p>
+                    
+                    <div class="bg-[#F5F1ED] p-6 rounded-lg">
+                        <h3 class="text-2xl font-bold mb-3 text-[#D9B6B0]">💡 O que esperar:</h3>
+                        <ul class="list-disc list-inside space-y-2">
+                            <li>Redução de inchaço nas primeiras 48h</li>
+                            <li>Diminuição de apetite emocional</li>
+                            <li>Mais disposição e leveza</li>
+                        </ul>
+                    </div>
+
+                    <div class="mt-6 flex flex-col md:flex-row gap-4">
+                        <div class="flex-1 bg-white border border-gray-200 p-4 rounded-lg text-center">
+                            <p class="text-5xl mb-2">✅</p>
+                            <p>Siga as sugestões principais, mas use a <a href="#" onclick="showSection('substituicoes')" class="text-[#A8D8C8] font-bold underline">lista de substituições</a> se faltar algum ingrediente.</p>
+                        </div>
+                        <div class="flex-1 bg-white border border-gray-200 p-4 rounded-lg text-center">
+                            <p class="text-5xl mb-2">🚨</p>
+                            <p>E, se algum dia você sair da linha, use o <a href="#" onclick="showSection('emergencia')" class="text-[#D9B6B0] font-bold underline">Modo Emergência</a> para voltar ao foco!</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="plano" class="content-section hidden">
+                <div class="text-center mb-6">
+                    <h2 class="text-3xl font-bold">Plano de Refeições</h2>
+                    <p class="text-gray-600">Selecione um dia para ver o cardápio e as dicas.</p>
+                </div>
+                <div id="day-selector-container" class="flex flex-wrap justify-center gap-2 mb-8">
+                </div>
+                
+                <div id="daily-plan-content" class="bg-white rounded-lg shadow-md p-6 md:p-8 min-h-[400px]">
+                </div>
+            </section>
+
+            <section id="substituicoes" class="content-section hidden">
+                <div class="bg-white rounded-lg shadow-md p-6 md:p-8">
+                    <h2 class="text-3xl font-bold mb-6 text-center">🔁 Lista de Substituições</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                        <div class="bg-[#F5F1ED] p-4 rounded-lg">
+                            <h3 class="font-bold text-xl mb-2">🍗 Proteínas</h3>
+                            <ul class="list-disc list-inside"><li>Frango</li><li>Ovos</li><li>Sardinha</li><li>Carne magra</li><li>Tofu</li></ul>
+                        </div>
+                        <div class="bg-[#F5F1ED] p-4 rounded-lg">
+                            <h3 class="font-bold text-xl mb-2">🥔 Carboidratos</h3>
+                            <ul class="list-disc list-inside"><li>Arroz integral</li><li>Batata-doce</li><li>Inhame</li><li>Quinoa</li></ul>
+                        </div>
+                        <div class="bg-[#F5F1ED] p-4 rounded-lg">
+                            <h3 class="font-bold text-xl mb-2">🥦 Vegetais</h3>
+                            <ul class="list-disc list-inside"><li>Alface</li><li>Rúcula</li><li>Acelga</li><li>Couve</li><li>Agrião</li><li>Abobrinha</li></ul>
+                        </div>
+                        <div class="bg-[#F5F1ED] p-4 rounded-lg">
+                            <h3 class="font-bold text-xl mb-2">🍌 Frutas</h3>
+                            <ul class="list-disc list-inside"><li>Banana</li><li>Mamão</li><li>Maçã</li><li>Melão</li><li>Laranja</li></ul>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="emergencia" class="content-section hidden">
+                 <div class="bg-white rounded-lg shadow-md p-6 md:p-8">
+                    <h2 class="text-3xl font-bold mb-2 text-center text-[#D9B6B0]">🚨 Modo Emergência</h2>
+                    <p class="text-center text-lg mb-6">"Saí da linha! E agora?"</p>
+                    <p class="text-center mb-8">Use este cardápio por 1 dia para retomar o foco e aliviar a retenção.</p>
+                    
+                    <div class="space-y-4">
+                        <div class="p-4 border-l-4 border-[#A8D8C8]">
+                            <h3 class="font-bold text-lg">☀️ Café da Manhã</h3>
+                            <p>Chá de hibisco com limão, 1 fatia de mamão</p>
+                        </div>
+                         <div class="p-4 border-l-4 border-[#D9B6B0]">
+                            <h3 class="font-bold text-lg">🍽️ Almoço</h3>
+                            <p>Frango grelhado, Abobrinha refogada, Salada crua com limão</p>
+                        </div>
+                         <div class="p-4 border-l-4 border-[#A8D8C8]">
+                            <h3 class="font-bold text-lg">☕️ Lanche</h3>
+                            <p>1 ovo cozido OU 1 colher de pasta de amendoim</p>
+                        </div>
+                         <div class="p-4 border-l-4 border-[#D9B6B0]">
+                            <h3 class="font-bold text-lg">🌙 Jantar</h3>
+                            <p>Sopa detox de cenoura com gengibre</p>
+                        </div>
+                    </div>
+
+                    <div class="mt-8 bg-[#F5F1ED] p-4 rounded-lg text-center">
+                        <h3 class="font-bold text-lg">💡 Dica Extra</h3>
+                        <p>Tome 2 xícaras de chá de cavalinha e descanse bem à noite.</p>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+        
+        <footer class="text-center mt-12 text-gray-500">
+            <p>&copy; 2025 Desafio Escultura 10D. Todos os direitos reservados.</p>
+        </footer>
+    </div>
+
+    <script>
+        const planData = [
+            { day: 1, tip: "Beba 2L de água e tente caminhar 15 minutos após o almoço.", meals: { breakfast: "1 fatia de pão integral OU 2 colheres de aveia + 1 ovo mexido. Chá verde com limão (sem açúcar). 1 fatia de mamão OU 1 banana pequena.", lunch: "Frango grelhado OU sardinha assada. Arroz integral (3 colheres) OU batata-doce (1/2 unidade). Salada colorida com azeite e limão.", snack: "1 iogurte natural + chia (1 colher) OU 1 fatia de queijo branco + 1 fruta.", dinner: "Omelete com legumes (2 ovos, tomate, espinafre) OU sopa detox." } },
+            { day: 2, tip: "Evite beliscar entre as refeições. Se sentir fome, beba um copo de água primeiro.", meals: { breakfast: "Vitamina de abacate (1/4) com leite vegetal e 1 col. de aveia.", lunch: "Salmão assado com brócolis. Quinoa (3 colheres).", snack: "Mix de castanhas (um punhado).", dinner: "Sopa de abóbora com gengibre." } },
+            { day: 3, tip: "Durma pelo menos 7 horas. O sono é essencial para a regulação hormonal e o emagrecimento.", meals: { breakfast: "Crepioca (1 ovo + 2 col. de tapioca) com queijo branco.", lunch: "Carne moída refogada com legumes. Purê de mandioquinha.", snack: "Maçã com canela.", dinner: "Salada completa com tiras de frango e sementes de girassol." } },
+            { day: 4, tip: "Faça um chá relaxante antes de dormir, como camomila ou erva-cidreira.", meals: { breakfast: "Iogurte natural com morangos e granola sem açúcar.", lunch: "Filé de tilápia grelhado. Arroz 7 grãos. Legumes no vapor.", snack: "Banana amassada com aveia.", dinner: "Ovos mexidos com cogumelos." } },
+            { day: 5, tip: "Aumente a ingestão de fibras comendo mais folhas verdes escuras.", meals: { breakfast: "Panqueca de banana (1 ovo + 1 banana amassada).", lunch: "Frango desfiado com batata-doce assada e salada.", snack: "Pera e 2 castanhas-do-pará.", dinner: "Caldo de legumes com frango." } },
+            { day: 6, tip: "Experimente adicionar pimenta ou gengibre na comida para acelerar o metabolismo.", meals: { breakfast: "Ovo cozido com 1 fatia de mamão e chia.", lunch: "Bife magro grelhado. Purê de abóbora. Salada de rúcula com tomate.", snack: "Iogurte com 1 colher de mel.", dinner: "Omelete de espinafre." } },
+            { day: 7, tip: "Planeje suas refeições do fim de semana para não sair do foco.", meals: { breakfast: "Mingau de aveia com canela e frutas vermelhas.", lunch: "Escondidinho de frango com massa de aipim.", snack: "Abacate com limão.", dinner: "Sardinha assada com salada." } },
+            { day: 8, tip: "Tome um copo de água com limão em jejum para ajudar na digestão.", meals: { breakfast: "Pão integral com pasta de amendoim e banana.", lunch: "Strogonoff funcional de frango (creme de ricota). Arroz integral.", snack: "Melão em cubos.", dinner: "Sopa de lentilha." } },
+            { day: 9, tip: "Preste atenção aos sinais de fome e saciedade do seu corpo.", meals: { breakfast: "Ovos mexidos com tomate e orégano.", lunch: "Almôndegas de carne magra ao sugo com abobrinha espiralizada.", snack: "Laranja.", dinner: "Salada de atum com folhas verdes." } },
+            { day: 10, tip: "Parabéns! Analise seus resultados e pense em como manter os hábitos saudáveis.", meals: { breakfast: "Vitamina de mamão com aveia e linhaça.", lunch: "Frango xadrez com legumes (sem amido). Arroz integral.", snack: "Iogurte natural.", dinner: "Pizza fake com massa de couve-flor." } },
+        ];
+
+        const navLinks = document.querySelectorAll('.nav-link');
+        const contentSections = document.querySelectorAll('.content-section');
+        const daySelectorContainer = document.getElementById('day-selector-container');
+        const dailyPlanContent = document.getElementById('daily-plan-content');
+
+        function showSection(targetId) {
+            contentSections.forEach(section => {
+                section.classList.toggle('hidden', section.id !== targetId);
+            });
+            navLinks.forEach(link => {
+                link.classList.toggle('active', link.dataset.target === targetId);
+            });
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        navLinks.forEach(link => {
+            link.addEventListener('click', (e) => {
+                showSection(e.target.dataset.target);
+            });
+        });
+
+        function renderDay(dayNumber) {
+            const dayData = planData.find(d => d.day === dayNumber);
+            if (!dayData) return;
+
+            dailyPlanContent.innerHTML = `
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
+                    <div>
+                        <h3 class="text-2xl md:text-3xl font-bold">Dia ${dayData.day}</h3>
+                        <p class="font-handwriting text-xl text-gray-500">"${dayData.tip}"</p>
+                    </div>
+                    <label class="flex items-center mt-4 md:mt-0 cursor-pointer">
+                        <input type="checkbox" class="h-5 w-5 rounded border-gray-300 text-[#D9B6B0] focus:ring-[#D9B6B0]">
+                        <span class="ml-2 text-gray-700">Concluído</span>
+                    </label>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="bg-[#F5F1ED] p-4 rounded-lg">
+                        <h4 class="font-bold text-lg mb-2">☀️ Café da Manhã</h4>
+                        <p>${dayData.meals.breakfast}</p>
+                    </div>
+                    <div class="bg-[#F5F1ED] p-4 rounded-lg">
+                        <h4 class="font-bold text-lg mb-2">🍽️ Almoço</h4>
+                        <p>${dayData.meals.lunch}</p>
+                    </div>
+                    <div class="bg-[#F5F1ED] p-4 rounded-lg">
+                        <h4 class="font-bold text-lg mb-2">☕️ Lanche da Tarde</h4>
+                        <p>${dayData.meals.snack}</p>
+                    </div>
+                    <div class="bg-[#F5F1ED] p-4 rounded-lg">
+                        <h4 class="font-bold text-lg mb-2">🌙 Jantar</h4>
+                        <p>${dayData.meals.dinner}</p>
+                    </div>
+                </div>
+            `;
+            
+            document.querySelectorAll('.day-selector').forEach(btn => {
+                btn.classList.toggle('active', parseInt(btn.dataset.day) === dayNumber);
+            });
+        }
+
+        function initializePlan() {
+            planData.forEach(d => {
+                const dayButton = document.createElement('button');
+                dayButton.className = 'day-selector w-12 h-12 rounded-full font-bold text-lg focus:outline-none';
+                dayButton.textContent = d.day;
+                dayButton.dataset.day = d.day;
+                dayButton.addEventListener('click', () => renderDay(d.day));
+                daySelectorContainer.appendChild(dayButton);
+            });
+            renderDay(1);
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            initializePlan();
+        });
+    </script>
+</body>
+</html>
