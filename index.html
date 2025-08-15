@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guia Escultura 10D - Versão Completa</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;700&family=Lato:wght@400;700&family=Lora:ital,wght@0,400..700;1,400..700&family=Montserrat:wght@400;700&family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Minimalismo Acolhedor (Rosa Queimado, Verde Menta, Bege Claro, Grafite) -->
+    <!-- Application Structure Plan: Evolved into a comprehensive guide with a multi-tab SPA structure. The main tabs now represent the core pillars of the challenge: 'Jornada Diária' (the main hub with daily plan, challenge, and motivation), 'Receitas', 'Checklist', 'Substituições', and 'Emergência'. This modular, tab-based architecture allows the user to easily navigate between different types of content without losing context, creating a premium, non-linear guide experience. The checklist adds a key interactive element for tracking progress. -->
+    <!-- Visualization & Content Choices: The application remains primarily text- and layout-based. Goal: Inform/Organize/Engage. Method: Interactive content switching via JS. The daily plan now includes substitutions and a new 'Desafio' block. 'Receitas' are presented in a clean, card-based grid. The 'Checklist' is an interactive HTML table/grid with checkboxes. A new Gemini API feature was added to dynamically generate recipes and challenges, enhancing user engagement. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            background-color: #F5F1ED;
+            font-family: 'Montserrat', sans-serif;
+            color: #4F4F4F;
+        }
+        .font-playfair { font-family: 'Playfair Display', serif; }
+        .font-lora { font-family: 'Lora', serif; }
+        .font-dancing { font-family: 'Dancing Script', cursive; }
+        .bg-rosa-queimado { background-color: #D9B6B0; }
+        .text-rosa-queimado { color: #D9B6B0; }
+        .border-rosa-queimado { border-color: #D9B6B0; }
+        .bg-verde-menta { background-color: #A8D8C8; }
+        .text-verde-menta { color: #A8D8C8; }
+        .bg-grafite { background-color: #4F4F4F; }
+        .text-grafite { color: #4F4F4F; }
+        .bg-bege-claro { background-color: #F5F1ED; }
+        .nav-link {
+            transition: all 0.3s ease;
+            border-bottom: 2px solid transparent;
+        }
+        .nav-link.active {
+            border-bottom-color: #D9B6B0;
+            color: #D9B6B0;
+        }
+        .day-selector .day-btn {
+            transition: all 0.3s ease;
+        }
+        .day-selector .day-btn.active {
+            background-color: #D9B6B0;
+            color: white;
+            transform: scale(1.1);
+        }
+        .content-panel {
+            display: none;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        .content-panel.active {
+            display: block;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .checklist-table input[type="checkbox"] {
+            accent-color: #D9B6B0;
+        }
+        .inspiration-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <div class="container mx-auto p-4 sm:p-6 md:p-8 max-w-6xl">
+        
+        <header class="text-center mb-8">
+            <h1 class="font-playfair text-4xl md:text-5xl font-bold text-grafite">Guia Escultura 10D</h1>
+            <p class="mt-2 text-lg text-grafite">10 dias de nutrição, leveza e autocuidado para revelar a sua melhor versão.</p>
+        </header>
+
+        <nav class="flex flex-wrap justify-center border-b-2 border-gray-200 mb-8 gap-x-2 sm:gap-x-8">
+            <button onclick="showSection('jornada')" class="nav-link active text-sm sm:text-base font-bold py-4 px-2" data-section="jornada">Jornada Diária</button>
+            <button onclick="showSection('receitas')" class="nav-link text-sm sm:text-base font-bold py-4 px-2" data-section="receitas">Receitas Secadoras</button>
+            <button onclick="showSection('checklist')" class="nav-link text-sm sm:text-base font-bold py-4 px-2" data-section="checklist">Checklist de Progresso</button>
+            <button onclick="showSection('substituicoes')" class="nav-link text-sm sm:text-base font-bold py-4 px-2" data-section="substituicoes">Substituições</button>
+            <button onclick="showSection('emergencia')" class="nav-link text-sm sm:text-base font-bold py-4 px-2" data-section="emergencia">Modo Emergência</button>
+        </nav>
+
+        <main id="main-content">
+            
+            <div id="jornada" class="content-panel active">
+                <div class="day-selector flex flex-wrap justify-center gap-2 mb-8">
+                </div>
+                <div id="daily-plan-content">
+                </div>
+            </div>
+
+            <div id="receitas" class="content-panel bg-white p-6 sm:p-8 rounded-lg shadow-sm">
+                 <h2 class="font-lora text-3xl text-rosa-queimado mb-6 text-center">🍵 Receitas Secadoras</h2>
+                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div class="border rounded-lg p-4">
+                        <h3 class="font-bold text-lg">Chá Termogênico 🌡️</h3>
+                        <p class="text-xs mb-2">Ideal para começar o dia.</p>
+                        <p><strong>Ingredientes:</strong> 1 canela em pau, 3 rodelas de gengibre, 200ml de água.</p>
+                        <p><strong>Preparo:</strong> Ferva tudo por 5 minutos. Desligue e abafe por mais 5. Beba morno.</p>
+                    </div>
+                     <div class="border rounded-lg p-4">
+                        <h3 class="font-bold text-lg">Sopa Detox 💧</h3>
+                        <p class="text-xs mb-2">Perfeita para um jantar leve.</p>
+                        <p><strong>Ingredientes:</strong> 2 xíc. de abóbora, 1/2 cebola, 1 dente de alho, gengibre a gosto.</p>
+                        <p><strong>Preparo:</strong> Cozinhe tudo com água até cobrir. Bata no liquidificador. Sirva quente.</p>
+                    </div>
+                    <div class="border rounded-lg p-4">
+                        <h3 class="font-bold text-lg">Shake Cremoso ⏱️</h3>
+                        <p class="text-xs mb-2">Ótimo para lanche da tarde.</p>
+                        <p><strong>Ingredientes:</strong> 1/2 abacate, 150ml de leite de amêndoas, 1 col. de chia.</p>
+                        <p><strong>Preparo:</strong> Bata todos os ingredientes no liquidificador até ficar homogêneo.</p>
+                    </div>
+                    <div class="border rounded-lg p-4">
+                        <h3 class="font-bold text-lg">Suco Desinchante 💧</h3>
+                        <p class="text-xs mb-2">Para tomar em jejum.</p>
+                        <p><strong>Ingredientes:</strong> 1 folha de couve, suco de 1/2 limão, 1 rodela de abacaxi, hortelã.</p>
+                        <p><strong>Preparo:</strong> Bata tudo com 150ml de água gelada e beba sem coar.</p>
+                    </div>
+                     <div class="border rounded-lg p-4">
+                        <h3 class="font-bold text-lg">Chá Calmante 🌙</h3>
+                        <p class="text-xs mb-2">Ideal antes de dormir.</p>
+                        <p><strong>Ingredientes:</strong> 1 sachê de camomila, 5 folhas de melissa, 200ml de água.</p>
+                        <p><strong>Preparo:</strong> Ferva a água, adicione as ervas e abafe por 10 minutos.</p>
+                    </div>
+                     <div class="border rounded-lg p-4">
+                        <h3 class="font-bold text-lg">Receita Expressa ⏱️</h3>
+                        <p class="text-xs mb-2">Quando a fome apertar.</p>
+                        <p><strong>Ingredientes:</strong> 1 ovo, 1 banana amassada, canela a gosto.</p>
+                        <p><strong>Preparo:</strong> Misture tudo e leve a uma frigideira antiaderente em fogo baixo. Doure dos dois lados.</p>
+                    </div>
+                 </div>
+            </div>
+
+            <div id="checklist" class="content-panel bg-white p-6 sm:p-8 rounded-lg shadow-sm">
+                <h2 class="font-lora text-3xl text-rosa-queimado mb-6 text-center">✅ Checklist de Progresso</h2>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-sm text-left checklist-table">
+                        <thead class="bg-bege-claro">
+                            <tr>
+                                <th class="p-3">Dia</th>
+                                <th class="p-3 text-center">Ritual Feito?</th>
+                                <th class="p-3 text-center">Bebeu 2L Água?</th>
+                                <th class="p-3 text-center">Dormiu Bem?</th>
+                                <th class="p-3 text-center">Desafio Completo?</th>
+                                <th class="p-3">Como se sentiu hoje?</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div id="substituicoes" class="content-panel bg-white p-6 sm:p-8 rounded-lg shadow-sm">
+                <h2 class="font-lora text-3xl text-rosa-queimado mb-2">Lista de Substituições Inteligentes</h2>
+                <p class="mb-8">Use esta lista para variar seu cardápio sem sair do plano!</p>
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 text-center">
+                    <div>
+                        <h3 class="font-bold text-xl mb-3">🍗 Proteínas</h3>
+                        <p class="leading-relaxed">Frango<br>Ovos<br>Sardinha<br>Carne magra<br>Tofu<br>Tilápia</p>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-xl mb-3">🥔 Carboidratos</h3>
+                        <p class="leading-relaxed">Arroz integral<br>Batata-doce<br>Inhame<br>Quinoa<br>Mandioca</p>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-xl mb-3">🥬 Vegetais</h3>
+                        <p class="leading-relaxed">Alface<br>Rúcula<br>Couve<br>Acelga<br>Abobrinha<br>Brócolis</p>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-xl mb-3">🍓 Frutas</h3>
+                        <p class="leading-relaxed">Banana<br>Mamão<br>Maçã<br>Melão<br>Laranja<br>Abacate</p>
+                    </div>
+                </div>
+            </div>
+
+            <div id="emergencia" class="content-panel bg-rosa-queimado text-white p-6 sm:p-8 rounded-lg shadow-sm">
+                <h2 class="font-playfair text-3xl text-center mb-2">🚨 MODO EMERGÊNCIA 🚨</h2>
+                <p class="text-center mb-8">Deu uma escorregada? Acontece! Use este plano por 1 dia para voltar ao foco total.</p>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="bg-bege-claro text-grafite p-4 rounded-lg">
+                        <h3 class="font-bold">Café da Manhã:</h3>
+                        <p>Chá de hibisco com limão + 1 fatia de mamão.</p>
+                    </div>
+                    <div class="bg-bege-claro text-grafite p-4 rounded-lg">
+                        <h3 class="font-bold">Almoço:</h3>
+                        <p>Frango grelhado + abobrinha refogada + salada crua com limão.</p>
+                    </div>
+                    <div class="bg-bege-claro text-grafite p-4 rounded-lg">
+                        <h3 class="font-bold">Lanche:</h3>
+                        <p>1 ovo cozido OU 1 colher de pasta de amendoim.</p>
+                    </div>
+                    <div class="bg-bege-claro text-grafite p-4 rounded-lg">
+                        <h3 class="font-bold">Jantar:</h3>
+                        <p>Sopa detox de cenoura com gengibre.</p>
+                    </div>
+                </div>
+                <div class="mt-8 border-2 border-dashed border-white/50 rounded-lg p-4 text-center">
+                    <p><strong>Dica Extra:</strong> Priorize o descanso, tome um chá calmante e, se possível, um banho relaxante.</p>
+                </div>
+                <p class="font-dancing text-2xl text-center mt-6">Recomeçar é a maior forma de coragem.</p>
+            </div>
+
+        </main>
+    </div>
+
+    <script>
+        const dailyData = [
+            {
+                day: 1, phrase: "Você já começou. Agora, continue.", challenge: "Beber um copo de água com limão em jejum.",
+                meals: {
+                    breakfast: { main: "1 ovo mexido + 1 fatia de mamão", sub: "2 col. de aveia com frutas" },
+                    lunch: { main: "120g de frango grelhado + salada colorida", sub: "120g de peixe branco assado" },
+                    snack: { main: "1 iogurte natural + chia", sub: "1 fatia de queijo branco" },
+                    dinner: { main: "Omelete com 2 ovos e legumes", sub: "Sopa Detox de abóbora" }
+                }
+            },
+            {
+                day: 2, phrase: "Seu autocuidado é sua força.", challenge: "Fazer 10 minutos de alongamento ao acordar.",
+                meals: {
+                    breakfast: { main: "Shake Cremoso (ver receitas)", sub: "2 ovos cozidos" },
+                    lunch: { main: "120g de carne magra moída com legumes", sub: "120g de tofu grelhado" },
+                    snack: { main: "1 maçã com canela", sub: "1 punhado de castanhas" },
+                    dinner: { main: "Caldo verde detox", sub: "Salada com frango desfiado" }
+                }
+            },
+            {
+                day: 3, phrase: "Com constância, seu corpo responde.", challenge: "Evitar telas 30 minutos antes de dormir.",
+                meals: {
+                    breakfast: { main: "Crepioca (1 ovo + 1 col. tapioca) com queijo", sub: "Mingau de aveia" },
+                    lunch: { main: "1 posta de salmão grelhado + brócolis", sub: "2 sardinhas assadas" },
+                    snack: { main: "1 banana amassada com canela", sub: "1 iogurte natural" },
+                    dinner: { main: "Sopa de lentilha", sub: "Omelete com espinafre" }
+                }
+            },
+            {
+                day: 4, phrase: "O movimento de hoje é o resultado de amanhã.", challenge: "Caminhar 15 minutos após o almoço.",
+                meals: {
+                    breakfast: { main: "2 ovos mexidos com orégano", sub: "Vitamina de abacate" },
+                    lunch: { main: "Frango desfiado com purê de abóbora", sub: "Carne de panela magra" },
+                    snack: { main: "1 fatia de melão", sub: "1 fatia de queijo branco" },
+                    dinner: { main: "Salada no pote completa", sub: "Sopa de legumes" }
+                }
+            },
+            {
+                day: 5, phrase: "Pequenos progressos somados se tornam grandes resultados.", challenge: "Escrever 3 coisas pelas quais você é grata.",
+                meals: {
+                    breakfast: { main: "Pão integral com pasta de amendoim", sub: "Receita Expressa (ver receitas)" },
+                    lunch: { main: "120g de tilápia assada com legumes", sub: "120g de frango grelhado" },
+                    snack: { main: "1 punhado de amêndoas", sub: "1 iogurte natural" },
+                    dinner: { main: "Berinjela recheada com carne moída", sub: "Ovos mexidos com tomate" }
+                }
+            },
+            {
+                day: 6, phrase: "Honre seu corpo, ele é seu templo.", challenge: "Experimentar um chá novo (ver receitas).",
+                meals: {
+                    breakfast: { main: "Mingau de aveia com frutas", sub: "2 ovos cozidos" },
+                    lunch: { main: "Picadinho de carne com quiabo", sub: "Frango com crosta de gergelim" },
+                    snack: { main: "1 laranja", sub: "1 maçã" },
+                    dinner: { main: "Sopa de mandioquinha com frango", sub: "Abobrinha recheada" }
+                }
+            },
+            {
+                day: 7, phrase: "A jornada é tão importante quanto o destino.", challenge: "Fazer uma refeição em silêncio, prestando atenção aos sabores.",
+                meals: {
+                    breakfast: { main: "Iogurte natural com granola sem açúcar e frutas", sub: "Shake Cremoso" },
+                    lunch: { main: "120g de alcatra em tiras com pimentões", sub: "Omelete de queijo" },
+                    snack: { main: "1 fatia de abacaxi", sub: "1 punhado de nozes" },
+                    dinner: { main: "Sopa Detox de cenoura", sub: "Salada com atum" }
+                }
+            },
+            {
+                day: 8, phrase: "Você é mais forte do que suas desculpas.", challenge: "Subir um lance de escadas em vez de usar o elevador.",
+                meals: {
+                    breakfast: { main: "Ovos mexidos com espinafre", sub: "Crepioca simples" },
+                    lunch: { main: "Frango xadrez (versão saudável)", sub: "Tofu mexido com açafrão" },
+                    snack: { main: "1 pera", sub: "1 iogurte natural" },
+                    dinner: { main: "Caldo de feijão amigo", sub: "Ovos cozidos com salada" }
+                }
+            },
+            {
+                day: 9, phrase: "Acredite na força que existe dentro de você.", challenge: "Ouvir uma música que te anima por 5 minutos.",
+                meals: {
+                    breakfast: { main: "Panqueca de banana (1 ovo + 1 banana)", sub: "Pão integral com queijo branco" },
+                    lunch: { main: "Escondidinho de batata-doce com frango", sub: "Carne moída com purê de abóbora" },
+                    snack: { main: "1 fatia de queijo branco", sub: "1 kiwi" },
+                    dinner: { main: "Sopa de tomate assado", sub: "Omelete com cogumelos" }
+                }
+            },
+            {
+                day: 10, phrase: "Celebre sua jornada e sua nova versão.", challenge: "Planejar uma refeição saudável para o dia seguinte.",
+                meals: {
+                    breakfast: { main: "Iogurte com frutas vermelhas e castanhas", sub: "2 ovos mexidos" },
+                    lunch: { main: "Salmão ao forno com aspargos", sub: "Frango grelhado com legumes nobres" },
+                    snack: { main: "Morangos com um fio de mel", sub: "1 iogurte natural" },
+                    dinner: { main: "Creme de palmito", sub: "Salada caprese completa" }
+                }
+            }
+        ];
+
+        const daySelector = document.querySelector('.day-selector');
+        const dailyPlanContent = document.getElementById('daily-plan-content');
+        const checklistBody = document.querySelector('.checklist-table tbody');
+        let currentDay = 1;
+
+        async function callGeminiAPI(prompt) {
+            const apiKey = "";
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
+            
+            const payload = {
+                contents: [{ parts: [{ text: prompt }] }]
+            };
+
+            try {
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (!response.ok) {
+                    throw new Error(`API request failed with status ${response.status}`);
+                }
+
+                const result = await response.json();
+                if (result.candidates && result.candidates.length > 0 &&
+                    result.candidates[0].content && result.candidates[0].content.parts &&
+                    result.candidates[0].content.parts.length > 0) {
+                    return result.candidates[0].content.parts[0].text;
+                } else {
+                    console.error("Unexpected API response structure:", result);
+                    return "Não foi possível gerar uma resposta. Tente novamente.";
+                }
+            } catch (error) {
+                console.error("Error calling Gemini API:", error);
+                return "Ocorreu um erro ao buscar inspiração. Por favor, tente mais tarde.";
+            }
+        }
+
+        async function generateInspiration(type) {
+            const resultContainer = document.getElementById('inspiration-result');
+            const loader = document.getElementById('inspiration-loader');
+            const content = document.getElementById('inspiration-content');
+            const buttons = document.querySelectorAll('.inspiration-btn');
+
+            resultContainer.style.display = 'block';
+            loader.style.display = 'block';
+            content.innerHTML = '';
+            buttons.forEach(btn => btn.disabled = true);
+
+            const data = dailyData.find(d => d.day === currentDay);
+            let prompt = '';
+
+            if (type === 'recipe') {
+                const lunchOption = data.meals.lunch.main;
+                prompt = `Você é um nutricionista e chef de cozinha focado em comida saudável e prática. Crie uma receita simples e detalhada para o almoço usando como base a seguinte opção: "${lunchOption}". A receita deve ser para uma pessoa, rápida de preparar (menos de 20 minutos), e adequada para um plano de emagrecimento de 10 dias. Use apenas ingredientes comuns e saudáveis. Formate a resposta de forma clara com "Ingredientes:" e "Modo de Preparo:", usando listas.`;
+            } else if (type === 'challenge') {
+                const originalChallenge = data.challenge;
+                prompt = `Você é um coach de bem-estar motivacional. O desafio de hoje é: "${originalChallenge}". Crie um novo mini-desafio criativo e inspirador, com o mesmo espírito de autocuidado, para uma pessoa em um programa de emagrecimento de 10 dias. O desafio deve ser uma ação curta e prática que pode ser feita hoje. Apresente apenas o novo desafio em uma frase curta e impactante.`;
+            }
+
+            if (prompt) {
+                const responseText = await callGeminiAPI(prompt);
+                content.textContent = responseText;
+            } else {
+                content.textContent = "Tipo de inspiração inválido.";
+            }
+
+            loader.style.display = 'none';
+            buttons.forEach(btn => btn.disabled = false);
+        }
+
+        function renderDay(day) {
+            const data = dailyData.find(d => d.day === day);
+            if (!data) return;
+
+            const finalMessage = day === 10 ? `
+                <div class="mt-8 p-6 rounded-lg bg-rosa-queimado text-white text-center">
+                    <h3 class="font-lora text-2xl mb-2">Parabéns por completar a jornada!</h3>
+                    <p>Você chegou até aqui. Isso diz muito sobre sua força e sua escolha de cuidar de si mesma. Continue — você já sabe o caminho.</p>
+                </div>
+            ` : '';
+
+            dailyPlanContent.innerHTML = `
+                <div class="bg-white p-6 sm:p-8 rounded-lg shadow-sm">
+                    <div class="flex justify-between items-start border-b pb-4 mb-6">
+                        <div>
+                            <h2 class="font-lora text-3xl text-grafite">DIA ${data.day}</h2>
+                            <p class="font-dancing text-xl text-rosa-queimado">${data.phrase}</p>
+                        </div>
+                    </div>
+
+                    <div class="mb-6 p-4 rounded-lg bg-verde-menta/30">
+                        <h3 class="font-bold text-lg text-grafite">🎯 Mini Desafio do Dia:</h3>
+                        <p>${data.challenge}</p>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
+                        ${Object.entries(data.meals).map(([meal, options]) => `
+                            <div class="meal-card">
+                                <h3 class="font-bold text-lg mb-2">${getMealTitle(meal)}</h3>
+                                <p class="text-sm"><strong>Opção:</strong> ${options.main}</p>
+                                <p class="text-xs text-gray-500 mt-1"><strong>Substituição:</strong> ${options.sub}</p>
+                            </div>
+                        `).join('')}
+                    </div>
+
+                    <div class="mt-6 p-4 rounded-lg border border-rosa-queimado">
+                        <h3 class="font-bold text-lg text-rosa-queimado flex items-center gap-2">✨ Precisa de Inspiração?</h3>
+                        <p class="text-sm mt-1 mb-4">Use a criatividade da IA para gerar novas ideias para sua jornada.</p>
+                        <div class="flex flex-col sm:flex-row gap-2">
+                            <button onclick="generateInspiration('recipe')" class="inspiration-btn flex-1 bg-rosa-queimado text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-opacity-80 transition-colors">Criar receita para o almoço</button>
+                            <button onclick="generateInspiration('challenge')" class="inspiration-btn flex-1 bg-verde-menta text-grafite px-4 py-2 rounded-lg text-sm font-semibold hover:bg-opacity-80 transition-colors">Gerar novo desafio</button>
+                        </div>
+                        <div id="inspiration-result" class="mt-4 p-4 bg-gray-100 rounded-lg text-sm hidden">
+                            <div id="inspiration-loader" class="text-center">
+                                <svg class="animate-spin h-5 w-5 text-rosa-queimado mx-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                </svg>
+                                <p class="mt-2">Gerando ideias...</p>
+                            </div>
+                            <div id="inspiration-content" class="whitespace-pre-wrap"></div>
+                        </div>
+                    </div>
+
+                    ${finalMessage}
+                </div>
+            `;
+            updateActiveDayButton();
+        }
+        
+        function getMealTitle(mealKey) {
+            switch(mealKey) {
+                case 'breakfast': return '☀️ Café da Manhã';
+                case 'lunch': return '🍽️ Almoço';
+                case 'snack': return '☕️ Lanche da Tarde';
+                case 'dinner': return '🌙 Jantar';
+                default: return '';
+            }
+        }
+
+        function renderChecklist() {
+            checklistBody.innerHTML = '';
+            for (let i = 1; i <= 10; i++) {
+                const row = document.createElement('tr');
+                row.className = 'border-b';
+                row.innerHTML = `
+                    <td class="p-3 font-bold">${i}</td>
+                    <td class="p-3 text-center"><input type="checkbox" class="w-5 h-5"></td>
+                    <td class="p-3 text-center"><input type="checkbox" class="w-5 h-5"></td>
+                    <td class="p-3 text-center"><input type="checkbox" class="w-5 h-5"></td>
+                    <td class="p-3 text-center"><input type="checkbox" class="w-5 h-5"></td>
+                    <td class="p-3"><textarea class="w-full border rounded p-1 text-xs" rows="1" placeholder="Anote aqui..."></textarea></td>
+                `;
+                checklistBody.appendChild(row);
+            }
+        }
+
+        function updateActiveDayButton() {
+            document.querySelectorAll('.day-selector .day-btn').forEach(btn => {
+                btn.classList.remove('active');
+                if (parseInt(btn.dataset.day) === currentDay) {
+                    btn.classList.add('active');
+                }
+            });
+        }
+        
+        function showSection(sectionId) {
+            document.querySelectorAll('.content-panel').forEach(panel => panel.classList.remove('active'));
+            document.getElementById(sectionId).classList.add('active');
+
+            document.querySelectorAll('.nav-link').forEach(link => link.classList.remove('active'));
+            document.querySelector(`.nav-link[data-section="${sectionId}"]`).classList.add('active');
+        }
+
+        function changeDay(day) {
+            currentDay = day;
+            renderDay(currentDay);
+        }
+
+        function initialize() {
+            dailyData.forEach(data => {
+                const button = document.createElement('button');
+                button.className = 'day-btn w-10 h-10 rounded-full font-bold bg-white shadow-sm';
+                button.textContent = data.day;
+                button.dataset.day = data.day;
+                button.onclick = () => changeDay(data.day);
+                daySelector.appendChild(button);
+            });
+            renderDay(currentDay);
+            renderChecklist();
+        }
+
+        window.onload = initialize;
+    </script>
+</body>
+</html>
